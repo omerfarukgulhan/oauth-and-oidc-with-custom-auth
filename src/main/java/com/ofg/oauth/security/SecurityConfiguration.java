@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -60,6 +63,11 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/auth/logout").hasAuthority("ROLE_USER")
 
+
+                                .requestMatchers(HttpMethod.GET, "/auth/test").authenticated()
+
+
+
                                 .anyRequest().permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(authEntryPoint))
@@ -74,7 +82,18 @@ public class SecurityConfiguration {
                     config.setAllowedHeaders(Collections.singletonList("*"));
                     config.setMaxAge(3600L);
                     return config;
-                }));
+                }))
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/api/v1/auth/login/oauth")
+                        .defaultSuccessUrl("/home", true)
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService()))
+                );
         return http.build();
     }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
+        return new CustomOAuth2UserService();
+    }
 }
+

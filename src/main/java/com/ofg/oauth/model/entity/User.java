@@ -21,6 +21,8 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    private String username;
+
     @Size(min = 3, max = 255)
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -30,13 +32,16 @@ public class User extends BaseEntity {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
     @Size(min = 8, max = 255)
     private String password;
 
     @Column(nullable = false)
     @Size(min = 10, max = 15)
     private String phoneNumber;
+
+    private String oauth2Provider;
+
+    private String oauth2Id;
 
     @Column(nullable = false)
     private boolean active = false;

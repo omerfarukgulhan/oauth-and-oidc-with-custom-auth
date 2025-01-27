@@ -12,6 +12,7 @@ import com.ofg.oauth.service.abstracts.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,8 +36,23 @@ public class AuthController {
         this.tokenType = tokenType;
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "Ok";
+    }
+
+    @GetMapping("/login/oauth")
+    public ResponseEntity<HttpStatus> login(){
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "http://localhost:8080/login/oauth2/code/github").build();
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<ApiDataResponse<AuthResponse>> login(@Valid @RequestBody SignInCredentials signInCredentials) {
+    public ResponseEntity<ApiDataResponse<AuthResponse>> login(
+            @Valid @RequestBody SignInCredentials signInCredentials,
+            @RequestParam("method") String method) {
+        if ("oauth".equals(method)) {
+
+        }
         AuthResponse authResponse = authService.login(signInCredentials);
         return ResponseUtil.createApiDataResponse(authResponse, LOGIN_SUCCESS, HttpStatus.OK);
     }
